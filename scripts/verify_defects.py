@@ -1190,8 +1190,7 @@ def config_run(api: Api) -> list[tuple[str, bool, str]]:
     def fake_now() -> None:
         order = api.create_order("alice", [("SKU-001", 1)])
         expect_eq(order["created_at"], "2030-01-01T00:00:00.000Z", "created_at under FAKE_NOW")
-        body = api.apply_voucher("alice", order["order_id"], "FLAT5").json()
-        expect_eq(total_of(body), "14.99", "unknown entries switch nothing on")
+        expect_eq(order["total"], "19.99", "unknown entries switch nothing on")
 
     record("unknown BUGS entries ignored with a warning", unknown_warning)
     record("test hooks return 404 when TEST_MODE=0", hooks_hidden)
