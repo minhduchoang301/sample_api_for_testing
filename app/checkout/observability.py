@@ -13,7 +13,7 @@ from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
 from app.common.jsonlog import logging_config as logging_config
 
-disable_created_metrics()
+disable_created_metrics()  # type: ignore[no-untyped-call]
 
 ORDERS_CREATED = Counter("orders_created_total", "Orders created")
 PAYMENTS = Counter("payments_total", "Payment outcomes by order status", ["status"])

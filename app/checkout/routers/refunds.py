@@ -12,7 +12,7 @@ from app.checkout import clock
 from app.checkout.bugs import bug_enabled
 from app.checkout.db import Payment, Refund, get_db
 from app.checkout.errors import ApiError
-from app.checkout.money import fmt, from_cents, q
+from app.checkout.money import ZERO, fmt, q
 from app.checkout.orders_service import load_order
 from app.checkout.schemas import RefundCreate, RefundOut
 from app.checkout.security import CurrentUser
@@ -31,7 +31,7 @@ def _paid_and_refunded(db: Session, order_id: str) -> tuple[Decimal, Decimal]:
     refunded = db.scalar(
         select(func.coalesce(func.sum(Refund.amount), 0)).where(Refund.order_id == order_id)
     )
-    return from_cents(int(paid or 0)), from_cents(int(refunded or 0))
+    return q(paid or ZERO), q(refunded or ZERO)
 
 
 def _refund_out(r: Refund, order_status: str | None = None) -> RefundOut:
