@@ -7,11 +7,13 @@ import time
 import uuid
 from typing import Any
 
-from prometheus_client import Counter, Histogram
+from prometheus_client import Counter, Histogram, disable_created_metrics
 from starlette.routing import Match
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
 from app.common.jsonlog import logging_config as logging_config
+
+disable_created_metrics()
 
 ORDERS_CREATED = Counter("orders_created_total", "Orders created")
 PAYMENTS = Counter("payments_total", "Payment outcomes by order status", ["status"])

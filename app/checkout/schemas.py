@@ -6,10 +6,13 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, PlainSerializer, field_validator
+
+from app.checkout import clock
 
 PositiveMoney = Annotated[Decimal, Field(gt=0, max_digits=12, decimal_places=2)]
 MoneyStr = Annotated[str, Field(examples=["16.99"])]
+Instant = Annotated[datetime, PlainSerializer(clock.isoformat, return_type=str)]
 
 
 class Strict(BaseModel):
@@ -70,7 +73,7 @@ class OrderOut(BaseModel):
     discount: MoneyStr
     total: MoneyStr
     voucher_code: str | None
-    created_at: datetime
+    created_at: Instant
     customer: str
 
 
@@ -98,8 +101,8 @@ class VoucherOut(BaseModel):
     code: str
     kind: Literal["percent", "fixed"]
     value: MoneyStr
-    valid_from: datetime
-    valid_until: datetime
+    valid_from: Instant
+    valid_until: Instant
     max_uses: int | None
     uses: int
 
@@ -131,7 +134,7 @@ class PaymentOut(BaseModel):
     amount: MoneyStr
     currency: str
     status: str
-    created_at: datetime
+    created_at: Instant
 
 
 class RefundCreate(Strict):
@@ -143,7 +146,7 @@ class RefundOut(BaseModel):
     order_id: str
     amount: MoneyStr
     created_by: str
-    created_at: datetime
+    created_at: Instant
     order_status: OrderStatus | None = None
 
 

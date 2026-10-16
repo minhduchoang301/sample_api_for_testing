@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PayLab Store</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="site-header">
+    <a class="brand" href="#/products">PayLab</a>
+    <nav aria-label="Main">
+      <ul class="nav-list">
+        <li><a href="#/products">Products</a></li>
+        <li>
+          <a href="#/cart">Cart
+            <span class="badge" data-testid="cart-badge" aria-hidden="true">0</span>
+            <span class="visually-hidden" id="cart-count-label">(0 items)</span>
+          </a>
+        </li>
+        <li data-auth="user" hidden><a href="#/orders">Order history</a></li>
+        <li data-auth="admin" hidden><a href="#/admin/refunds">Refunds</a></li>
+      </ul>
+    </nav>
+    <div class="session">
+      <span id="session-user"></span>
+      <a href="#/login" id="login-link">Sign in</a>
+      <button type="button" id="logout-button" class="link-button" hidden>Sign out</button>
+    </div>
+  </header>
+  <main id="main" tabindex="-1">
+    <p>Loading…</p>
+  </main>
+  <footer class="site-footer">
+    <p>PayLab demo store. Prices in Canadian dollars (CAD).</p>
+  </footer>
+</body>
+</html>
