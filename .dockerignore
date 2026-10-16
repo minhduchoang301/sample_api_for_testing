@@ -1,0 +1,8 @@
+.git
+.venv
+**/__pycache__
+.mypy_cache
+.ruff_cache
+scripts
+verify-output
+*.md
