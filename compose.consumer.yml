@@ -1,0 +1,46 @@
+# Runs the published PayLab images. No source checkout needed:
+#   docker login ghcr.io            (if the packages are private)
+#   PAYLAB_OWNER=<github-owner> docker compose -f compose.consumer.yml up -d --wait
+name: paylab
+
+services:
+  checkout:
+    image: ghcr.io/${PAYLAB_OWNER:-OWNER}/paylab-checkout:${PAYLAB_TAG:-latest}
+    ports:
+      - "8000:8000"
+    environment:
+      BUGS: ${BUGS:-}
+      TEST_MODE: ${TEST_MODE:-1}
+      FAKE_NOW: ${FAKE_NOW:-}
+      JWT_SECRET: ${JWT_SECRET:-paylab-dev-jwt-secret}
+      WEBHOOK_SECRET: ${WEBHOOK_SECRET:-whsec_paylab_dev}
+      PROVIDER_URL: http://provider:8001
+      PROVIDER_TIMEOUT_S: ${PROVIDER_TIMEOUT_S:-3}
+      CALLBACK_BASE_URL: http://checkout:8000
+    volumes:
+      - checkout-data:/data
+    depends_on:
+      provider:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=2).status == 200 else 1)"]
+      interval: 3s
+      timeout: 3s
+      start_period: 5s
+      retries: 15
+
+  provider:
+    image: ghcr.io/${PAYLAB_OWNER:-OWNER}/paylab-provider:${PAYLAB_TAG:-latest}
+    ports:
+      - "8001:8001"
+    environment:
+      WEBHOOK_SECRET: ${WEBHOOK_SECRET:-whsec_paylab_dev}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8001/health', timeout=2).status == 200 else 1)"]
+      interval: 3s
+      timeout: 3s
+      start_period: 5s
+      retries: 15
+
+volumes:
+  checkout-data:

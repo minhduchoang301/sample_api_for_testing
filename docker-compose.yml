@@ -1,0 +1,49 @@
+name: paylab
+
+services:
+  checkout:
+    build:
+      context: .
+      dockerfile: docker/checkout.Dockerfile
+    image: paylab-checkout:local
+    ports:
+      - "8000:8000"
+    environment:
+      BUGS: ${BUGS:-}
+      TEST_MODE: ${TEST_MODE:-1}
+      FAKE_NOW: ${FAKE_NOW:-}
+      JWT_SECRET: ${JWT_SECRET:-paylab-dev-jwt-secret}
+      WEBHOOK_SECRET: ${WEBHOOK_SECRET:-whsec_paylab_dev}
+      PROVIDER_URL: http://provider:8001
+      PROVIDER_TIMEOUT_S: ${PROVIDER_TIMEOUT_S:-3}
+      CALLBACK_BASE_URL: http://checkout:8000
+    volumes:
+      - checkout-data:/data
+    depends_on:
+      provider:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=2).status == 200 else 1)"]
+      interval: 3s
+      timeout: 3s
+      start_period: 5s
+      retries: 15
+
+  provider:
+    build:
+      context: .
+      dockerfile: docker/provider.Dockerfile
+    image: paylab-provider:local
+    ports:
+      - "8001:8001"
+    environment:
+      WEBHOOK_SECRET: ${WEBHOOK_SECRET:-whsec_paylab_dev}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8001/health', timeout=2).status == 200 else 1)"]
+      interval: 3s
+      timeout: 3s
+      start_period: 5s
+      retries: 15
+
+volumes:
+  checkout-data:
